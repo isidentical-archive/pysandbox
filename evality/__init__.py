@@ -11,7 +11,7 @@ from urllib.request import Request, urlopen
 
 import docker
 
-from purifier import Insecure, Purifier
+from evality.purifier import Insecure, Purifier
 
 
 class Evality:
@@ -85,9 +85,3 @@ class Evality:
     def check_empty_port(port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         return not bool(sock.connect_ex(("127.0.0.1", port)))
-
-
-if __name__ == "__main__":
-    docker_client = docker.from_env()
-    api_client = docker.APIClient(base_url="unix://var/run/docker.sock")
-    evality = Evality(docker_client, api_client)
