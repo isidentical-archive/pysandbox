@@ -1,0 +1,10 @@
+Evality
+
+Simple way to run untrusted python code in a sandboxed environment powered by docker. Evality accepts requests through an API, puts them into a queue and runs them one-by-one in a container. It tries to avoid all I/O operations but this is hard to being sure about with CPython.
+
+
+Container 1 | -                                              - | Client 1
+Container 2 | -                                              - | Client 2
+Container 3 | - - - Evality < - - Purifier < - - Sandboxer < - | Client 3
+....        | -                                              - | ....
+Container n | -                                              - | Client n
