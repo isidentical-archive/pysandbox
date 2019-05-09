@@ -13,14 +13,13 @@ print(2 + 2)
 
 Purifier
 --------
-Purifies the code as much as it can via ast.NodeTransformer. After that compiles the ast to a code object, marshals it, encodes it and ships it to next node in pipeline.
-
-The preffered encoding is base64.
+Checks for any potential threats in code. Raises Insecure exception if sees any.
 
 Evality
 -------
-Takes purified bytecode as a base64 string and dont touches it until it ships to next node. The main purpose of evality is creating / managing containers that contains executors.
+Responsible for managing containers and sending data to them. Takes user code that is checked from Purifier. Compiles it to bytecode, marshals it and encodes it before shipping it via JSON. Starts container in every action of running command.
 
+The preffered encoding is base64.
 Evality uses ports in a range of 1765 to nth container running same time
 
 Executor
