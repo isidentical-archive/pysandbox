@@ -1,21 +1,24 @@
+import os
 import docker
-from platform import python_version
-    
-class Evality:
-    def __init__(self, client):
-        self._client = client
-        self._base_image = self.obtain_image(python_version())
+from pathlib import Path
 
-    def obtain_image(self, version):
-        image = f"python:{version[:3]}-alpine"
+class Evality:
+    def __init__(self, docker_client, api_client):
+        self._docker_client = docker_client
+        self._api_client = api_client
+        self._image = self.obtain_image()
+
+    def obtain_image(self):
         try:
-            image = self._client.images.get(image)
-        except:
-            image = self._client.images.pull(image)
-        
-        return image
+            return self._docker_client.images.get('evality')
+        except docker.errors.ImageNotFound:
+            return self._docker_client.images.build(
+                path = os.fspath(Path(__file__).parent), 
+                tag='evality'
+            )[0]
 
 if __name__ == '__main__':
-    client = docker.from_env()
-    evality = Evality(client)
+    docker_client = docker.from_env()
+    api_client = docker.APIClient(base_url='unix://var/run/docker.sock')
+    evality = Evality(docker_client, api_client)
     print(evality._image)
