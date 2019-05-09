@@ -1,3 +1,4 @@
+import os
 import json
 import marshal
 from base64 import b64decode
@@ -47,4 +48,4 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    executor = Executor(handler=Handler)
+    executor = Executor(port = os.environ.get('EXECUTOR_PORT', 18888), handler=Handler)
