@@ -1,10 +1,35 @@
 Evality
+-------
 
-Simple way to run untrusted python code in a sandboxed environment powered by docker. Evality accepts requests through an API, puts them into a queue and runs them one-by-one in a container. It tries to avoid all I/O operations but this is hard to being sure about with CPython.
+Evality is a backend for untrusted python sources. It is based on CPython's bytecode format and containers. It works step by step through the pipeline of evality. 
 
+Client > Purifier > Evality > Executor > Container
 
-Container 1 | -                                              - | Client 1
-Container 2 | -                                              - | Client 2
-Container 3 | - - - Evality < - - Purifier < - - Sandboxer < - | Client 3
-....        | -                                              - | ....
-Container n | -                                              - | Client n
+Client
+------
+Sends untrusted python code as a raw string. E.g;
+
+print(2 + 2)
+
+Purifier
+--------
+Purifies the code as much as it can via ast.NodeTransformer. After that compiles the ast to a code object, marshals it, encodes it and ships it to next node in pipeline.
+
+The preffered encoding is base64.
+
+Evality
+-------
+Takes purified bytecode as a base64 string and dont touches it until it ships to next node. The main purpose of evality is creating / managing containers that contains executors.
+
+Executor
+--------
+An HTTP service that takes base64 encoded python bytecode. It executes bytecode in a listened environment. Routes standard out and error file descriptors to a buffer and returns it as a json format.
+
+Request: {'code': '<b64encoded-bytecode>'}
+Response (200): {'result': {'out': '<stdout>', 'err': '<stderr'}}
+Response (400): {'result': 'FAIL'}
+Response (500): {'result': 'FAIL'}
+
+Container
+---------
+A python:<python-version>-alpine image that contains executor
