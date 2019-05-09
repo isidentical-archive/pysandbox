@@ -1,24 +1,10 @@
 import docker
-from io import BytesIO
-from dataclass import dataclass, field
 from platform import python_version
-
-BytField = field(default_factory=BytesIO)
-
-@dataclass
-class Buffers:
-    stdout: BytesIO = BytField
-    stdin: BytesIO = BytField
-    
-@dataclass
-class Result:
-    exit_code: int
-    buffers: Buffers = field(default_factory=Buffers)
     
 class Evality:
     def __init__(self, client):
         self._client = client
-        self._image = self.obtain_image(
+        self._base_image = self.obtain_image(python_version())
 
     def obtain_image(self, version):
         image = f"python:{version[:3]}-alpine"
@@ -28,3 +14,8 @@ class Evality:
             image = self._client.images.pull(image)
         
         return image
+
+if __name__ == '__main__':
+    client = docker.from_env()
+    evality = Evality(client)
+    print(evality._image)
