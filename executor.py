@@ -1,6 +1,6 @@
-import os
 import json
 import marshal
+import os
 from base64 import b64decode
 from contextlib import redirect_stderr, redirect_stdout
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -48,4 +48,4 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    executor = Executor(port = os.environ.get('EXECUTOR_PORT', 18888), handler=Handler)
+    executor = Executor(port=os.environ.get("EXECUTOR_PORT", 18888), handler=Handler)

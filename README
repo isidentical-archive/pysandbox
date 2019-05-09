@@ -21,6 +21,8 @@ Evality
 -------
 Takes purified bytecode as a base64 string and dont touches it until it ships to next node. The main purpose of evality is creating / managing containers that contains executors.
 
+Evality uses ports in a range of 1765 to nth container running same time
+
 Executor
 --------
 An HTTP service that takes base64 encoded python bytecode. It executes bytecode in a listened environment. Routes standard out and error file descriptors to a buffer and returns it as a json format.
