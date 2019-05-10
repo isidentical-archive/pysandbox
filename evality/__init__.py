@@ -14,12 +14,13 @@ import docker
 
 from evality.purifier import Insecure, Purifier
 
+DOCKER_FILE_PATH = os.fspath(Path(__file__).parent)
 
 class Evality:
     def __init__(self, docker_client, api_client):
         self._docker_client = docker_client
         self._api_client = api_client
-        self._image = self.obtain_image(force_build = True)
+        self._image = self.obtain_image()
 
         self._instances = {}
         self._ports = {}
@@ -95,7 +96,7 @@ class Evality:
             return self._docker_client.images.get("evality")
         except docker.errors.ImageNotFound:
             return self._docker_client.images.build(
-                path=os.fspath(Path(__file__).parent), tag="evality"
+                path=DOCKER_FILE_PATH, tag="evality"
             )[0]
 
     def _get_free_port(self, plus=1):
