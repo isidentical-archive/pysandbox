@@ -8,7 +8,7 @@ with open(current_dir / "README", encoding="utf-8") as f:
 
 setup(
     name="Evality",
-    version="0.1",
+    version="0.1.2",
     packages=find_packages(),
     url="https://github.com/isidentical/evality",
     description="Safe evaluation of untrusted code on containers",

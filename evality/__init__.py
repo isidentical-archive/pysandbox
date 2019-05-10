@@ -82,7 +82,9 @@ class Evality:
     def quit(self):
         for container in self._instances.copy():
             self.quit_single(container)
-
+        
+        self._ports = {}
+    
     def quit_single(self, idx):
         return self._instances.pop(idx).kill()
 
