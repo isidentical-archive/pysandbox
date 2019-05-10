@@ -1,5 +1,5 @@
-import atexit
 import ast
+import atexit
 import json
 import marshal
 import os
@@ -19,7 +19,7 @@ class Evality:
     def __init__(self, docker_client, api_client):
         self._docker_client = docker_client
         self._api_client = api_client
-        self._image = self.obtain_image()
+        self._image = self.obtain_image(force_build = True)
 
         self._instances = {}
         self._ports = {}
@@ -82,14 +82,16 @@ class Evality:
     def quit(self):
         for container in self._instances.copy():
             self.quit_single(container)
-        
+
         self._ports = {}
-    
+
     def quit_single(self, idx):
         return self._instances.pop(idx).kill()
 
-    def obtain_image(self):
+    def obtain_image(self, force_build = False):
         try:
+            if force_build:
+                raise docker.errors.ImageNotFound(None)
             return self._docker_client.images.get("evality")
         except docker.errors.ImageNotFound:
             return self._docker_client.images.build(

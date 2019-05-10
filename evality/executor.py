@@ -6,7 +6,10 @@ from contextlib import redirect_stderr, redirect_stdout
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from io import StringIO
 
+from namekeeper import NameKeeper
+
 MARSHAL_RAISES = (KeyError, ValueError, TypeError, EOFError)
+nk = NameKeeper()
 
 
 class Executor:
@@ -16,10 +19,14 @@ class Executor:
 
     @staticmethod
     def execute(self, code):
+        global nk
+
         out = StringIO()
         err = StringIO()
         with redirect_stdout(out), redirect_stderr(err):
-            exec(code)
+            _exec = exec
+            with nk.secure_scope():
+                _exec(code)
 
         return {"out": out.getvalue(), "err": err.getvalue()}
 
@@ -37,8 +44,10 @@ class Handler(SimpleHTTPRequestHandler):
             code = marshal.loads(b64decode(body["code"]))
             self.respond(self.execute(code), 200)
         except MARSHAL_RAISES as exc:
+            print(exc)
             self.respond("FAIL", 400)
         except Exception as exc:
+            print(exc)
             self.respond("FAIL", 500)
 
     def respond(self, result, code):
