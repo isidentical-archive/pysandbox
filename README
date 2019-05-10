@@ -1,9 +1,11 @@
 Evality
 -------
 
+*Unstable*
+
 Evality is a backend for untrusted python sources. It is based on CPython's bytecode format and containers. It works step by step through the pipeline of evality. 
 
-Client > Purifier > Evality > Executor > Container
+Client > Purifier > Evality > Executor > NameKeeper > Container
 
 Client
 ------
@@ -26,12 +28,16 @@ Evality uses ports in a range of 1765 to nth container running same time
 
 Executor
 --------
-An HTTP service that takes base64 encoded python bytecode. It executes bytecode in a listened environment. Routes standard out and error file descriptors to a buffer and returns it as a json format.
+An HTTP service that takes base64 encoded python bytecode. It executes bytecode in a listened environment. Routes standard out and error file descriptors to a buffer and returns it as a json format. That listened environment provided by NameKeeper.
 
 Request: {'code': '<b64encoded-bytecode>'}
 Response (200): {'result': {'out': '<stdout>', 'err': '<stderr'}}
 Response (400): {'result': 'FAIL'}
 Response (500): {'result': 'FAIL'}
+
+NameKeeper
+----------
+Namekeeper is a standalone context manager for forbidding builtin function, patching type attributes etc. It forbids eval/compile/exec/open/input/ and patches import. Also it removes some members of types. 
 
 Container
 ---------
