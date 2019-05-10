@@ -19,6 +19,8 @@ Evality
 -------
 Responsible for managing containers and sending data to them. Takes user code that is checked from Purifier. Compiles it to bytecode, marshals it and encodes it before shipping it via JSON. Starts container in every action of running command.
 
+Uses container caching by giving id values to every container it started. If given id not found in instances; it will start new and after it is done with it, it will pause instead of kill. `quit` method should be called before exitting.
+
 The preffered encoding is base64.
 Evality uses ports in a range of 1765 to nth container running same time
 

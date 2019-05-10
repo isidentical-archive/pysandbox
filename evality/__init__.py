@@ -1,9 +1,9 @@
+import atexit
 import ast
 import json
 import marshal
 import os
 import socket
-import sys
 import time
 from base64 import b64encode
 from contextlib import contextmanager
@@ -26,6 +26,7 @@ class Evality:
 
         self._delay = 1.5
         self._purifier = Purifier()
+        atexit.register(self.quit)
 
     def run_cmd(self, code, idx=0):
         """Runs python code on the containers,
