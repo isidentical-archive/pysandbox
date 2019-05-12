@@ -6,34 +6,24 @@ from contextlib import redirect_stderr, redirect_stdout
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from io import StringIO
 
-from namekeeper import NameKeeper
+from .namekeeper import NameKeeper
 
 MARSHAL_RAISES = (KeyError, ValueError, TypeError, EOFError)
 nk = NameKeeper()
 
+def execute(code):
+    global nk
 
-class Executor:
-    def __init__(self, host="", port=18888, handler=SimpleHTTPRequestHandler):
-        self._httpd = HTTPServer((host, port), handler)
-        self._httpd.serve_forever()
+    out = StringIO()
+    err = StringIO()
+    with redirect_stdout(out), redirect_stderr(err):
+        _exec = exec
+        with nk.secure_scope():
+            _exec(code)
 
-    @staticmethod
-    def execute(self, code):
-        global nk
-
-        out = StringIO()
-        err = StringIO()
-        with redirect_stdout(out), redirect_stderr(err):
-            _exec = exec
-            with nk.secure_scope():
-                _exec(code)
-
-        return {"out": out.getvalue(), "err": err.getvalue()}
-
+    return {"out": out.getvalue(), "err": err.getvalue()}
 
 class Handler(SimpleHTTPRequestHandler):
-    execute = Executor.execute
-
     def do_POST(self, *args, **kwargs):
         content_length = int(self.headers["Content-Length"])
         raw_body = self.rfile.read(content_length).decode()
@@ -54,6 +44,11 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_response(code)
         self.end_headers()
         self.wfile.write(json.dumps({"result": result}).encode())
+
+class Executor:
+    def __init__(self, host="", port=18888, handler=Handler):
+        self._httpd = HTTPServer((host, port), handler)
+        self._httpd.serve_forever()
 
 
 if __name__ == "__main__":

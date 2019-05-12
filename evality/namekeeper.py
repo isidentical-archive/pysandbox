@@ -4,7 +4,7 @@ import types
 from collections import defaultdict
 from contextlib import contextmanager
 
-from sww import get_members
+from .sww import get_members
 
 FORBID_ACCESS = ["open", "exec", "eval", "compile", "input"]
 FORBID_BY_TYPE_ACCESS = {
