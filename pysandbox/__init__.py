@@ -12,11 +12,11 @@ from urllib.request import Request, urlopen
 
 import docker
 
-from evality.purifier import Insecure, Purifier
+from pysandbox.purifier import Insecure, Purifier
 
 DOCKER_FILE_PATH = os.fspath(Path(__file__).parent)
 
-class Evality:
+class PySandbox:
     def __init__(self, docker_client, api_client):
         self._docker_client = docker_client
         self._api_client = api_client
@@ -37,7 +37,7 @@ class Evality:
         try:
             self._purifier.visit(tree)
 
-            code = compile(tree, "<evality>", "exec")
+            code = compile(tree, "<pysandbox>", "exec")
             code = marshal.dumps(code)
             code = b64encode(code)
 
@@ -67,7 +67,7 @@ class Evality:
         else:
             port = self._get_free_port()
             container = self._docker_client.containers.run(
-                "evality", ports={"18888/tcp": port}, detach=True
+                "pysandbox", ports={"18888/tcp": port}, detach=True
             )
             self._ports[container] = port
             self._instances[idx] = container
@@ -93,10 +93,10 @@ class Evality:
         try:
             if force_build:
                 raise docker.errors.ImageNotFound(None)
-            return self._docker_client.images.get("evality")
+            return self._docker_client.images.get("pysandbox")
         except docker.errors.ImageNotFound:
             return self._docker_client.images.build(
-                path=DOCKER_FILE_PATH, tag="evality"
+                path=DOCKER_FILE_PATH, tag="pysandbox"
             )[0]
 
     def _get_free_port(self, plus=1):
